@@ -4,7 +4,7 @@ from logger import eventLogger
 from classifier import classifier
 from path_builder import pathBuilder
 
-SRC = input("path: ")
+SRC = str(sys.argv[1])
 
 MAIN_DIR = "epco_files"
 SIMPLIFIED_SRC_PATH = (SRC.replace(":", "__")).replace("/", "__")
