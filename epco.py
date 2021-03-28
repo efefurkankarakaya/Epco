@@ -1,94 +1,80 @@
 import os
 import sys
 from shutil import copy
-from datetime import datetime
 import uuid
 import pathlib
 
-destination = str(sys.argv[1])
+from logger import eventLogger
 
-mainFolder = "epco_files"
-simplifiedFolderName = (destination.replace(":", "__")).replace("/", "__")
-theFolder = mainFolder + "/" + simplifiedFolderName
+SRC = str(sys.argv[1])
 
-documentFolder = theFolder + "/documents"
-audioFolder =  theFolder + "/audios"
-videoFolder = theFolder + "/videos"
-imageFolder = theFolder + "/images"
-archiveFolder = theFolder + "/archives"
-otherFolder = theFolder + "/others"
+MAIN_DIR = "epco_files"
+SIMPLIFIED_SRC_PATH = (SRC.replace(":", "__")).replace("/", "__")
+DST = MAIN_DIR + "/" + SIMPLIFIED_SRC_PATH
 
-documentExtensions = [".rtf", ".txt", ".pdf", ".docx", ".doc"]
-audioExtensions = [".mp3", ".flac", ".wav"]
-videoExtensions = [".mp4", ".webm"]
-imageExtensions = [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".heif", ".heic"]
-archiveExtensions = [".rar", ".zip"]
-otherExtensions = [".py", ".exe"]
+DOC_DST_PATH = DST + "/documents"
+AUD_DST_PATH =  DST + "/audios"
+VID_DST_PATH = DST + "/videos"
+IMG_DST_PATH = DST + "/images"
+ARCH_DST_PATH = DST + "/archives"
+OTR_DST_PATH = DST + "/others"
 
-def FolderCreator():
+DOC_EXT_LST = [".rtf", ".txt", ".pdf", ".docx", ".doc"]
+AUD_EXT_LST = [".mp3", ".flac", ".wav"]
+VID_EXT_LST = [".mp4", ".webm"]
+IMG_EXT_LST = [".jpg", ".jpeg", ".png", ".bmp", ".gif", ".heif", ".heic"]
+ARCH_EXT_LST = [".rar", ".zip"]
+OTR_EXT_LST = [".py", ".exe"]
+
+def pathCreator():
     try:
-        os.makedirs(theFolder)
-        print(f"[status] created : {theFolder}")
+        os.makedirs(DST)
+        print(f"[status] created : {DST}")
     except FileExistsError:
-        print(f"[status] already exists : {theFolder}")
+        print(f"[status] already exists : {DST}")
     except:
-        print("[status] an unknown error occurred in FolderCreator function")
+        print("[status] an unknown error occurred in pathCreator function")
 
-def DetailWriter(folder, filePath):
-    with open(f"{folder}/details/details.txt",
-              "a+",
-              encoding="utf-8") as detail:
-        secondsCT = os.stat(os.path.abspath(filePath)).st_ctime
-        creationTime = datetime.fromtimestamp(secondsCT)
-        secondsLMT = os.stat(os.path.abspath(filePath)).st_mtime
-        lastModifiedTime = datetime.fromtimestamp(secondsLMT)
-        secondsLAT = os.stat(os.path.abspath(filePath)).st_atime
-        lastAccessTime = datetime.fromtimestamp(secondsLAT)
-        detail.write("File Name: " + filePath + "\n" + "Creation Time: " +
-                     str(creationTime) + "\n" + "Last Modified Time: " +
-                     str(lastModifiedTime) + "\n" + "Last Access Time: " +
-                     str(lastAccessTime) + "\n\n*\n\n")
-
-def PathRouter(extensionList, folder):
-    for path, directory, file in os.walk(destination):
+def classifier(extensionList, destinationPath):
+    for path, directory, file in os.walk(SRC):
         for fileName in file:
             filePath = path + "/" + fileName
             for extension in extensionList:
                 if (fileName.endswith(extension)):
-                    if (not os.path.exists(folder)):
+                    if (not os.path.exists(destinationPath)):
                         try:
-                            os.mkdir(folder)
-                            print(f"[status] created : {folder}")
-                            if (os.path.exists(folder)):
-                                details = folder + "/details"
+                            os.mkdir(destinationPath)
+                            print(f"[status] created : {destinationPath}")
+                            if (os.path.exists(destinationPath)):
+                                details = destinationPath + "/details"
                                 os.mkdir(details)
                                 print(f"[status] created : {details}")
                         except FileExistsError:
-                            print(f"[status] already exists : {folder}")
+                            print(f"[status] already exists : {destinationPath}")
                         except:
-                            print(f"[status] an unknown error occurred in {folder} creation")
+                            print(f"[status] an unknown error occurred in {destinationPath} creation")
                             break
-                    newFilePath = folder + "/" + fileName
+                    newFilePath = destinationPath + "/" + fileName
                     if (not os.path.exists(newFilePath)):
-                        copy(filePath, folder)
+                        copy(filePath, destinationPath)
                         print(f"[status] file fetched : {filePath}")
-                        DetailWriter(folder, filePath)
+                        eventLogger(destinationPath, filePath)
                     else:
                         # print(f"[status] could not fetched, already exists : {fileName}")
-                        uniquePath = folder + "/" + os.path.splitext(fileName)[0] + "-" + str(uuid.uuid4()) + pathlib.Path(fileName).suffix
+                        uniquePath = destinationPath + "/" + os.path.splitext(fileName)[0] + "-" + str(uuid.uuid4()) + pathlib.Path(fileName).suffix
                         print(f"{uniquePath=}")
                         copy(filePath, uniquePath)
                         # print(f"[status : unique] file fetched : {filePath}")
-                        DetailWriter(folder, filePath)
+                        eventLogger(destinationPath, filePath)
 
 def main():
-    FolderCreator()
-    PathRouter(documentExtensions, documentFolder)
-    PathRouter(audioExtensions, audioFolder)
-    PathRouter(videoExtensions, videoFolder)
-    PathRouter(imageExtensions, imageFolder)
-    PathRouter(archiveExtensions, archiveFolder)
-    PathRouter(otherExtensions, otherFolder)
+    pathCreator()
+    classifier(DOC_EXT_LST, DOC_DST_PATH)
+    classifier(AUD_EXT_LST, AUD_DST_PATH)
+    classifier(VID_EXT_LST, VID_DST_PATH)
+    classifier(IMG_EXT_LST, IMG_DST_PATH)
+    classifier(ARCH_EXT_LST, ARCH_DST_PATH)
+    classifier(OTR_EXT_LST, OTR_DST_PATH)
 
 if __name__ == "__main__":
     main()
