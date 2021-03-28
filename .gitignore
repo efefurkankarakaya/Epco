@@ -6,3 +6,6 @@ epco_files
 
 # virtual env
 venv
+
+# module cache
+__pycache__
