@@ -1,9 +1,8 @@
 import os
-
 from datetime import datetime
 
-def eventLogger(folder, filePath):
-    with open(f"{folder}/details/details.txt",
+def eventLogger(destinationPath, filePath):
+    with open(f"{destinationPath}/details/details.txt",
               "a+",
               encoding="utf-8") as detail:
         secondsCT = os.stat(os.path.abspath(filePath)).st_ctime
