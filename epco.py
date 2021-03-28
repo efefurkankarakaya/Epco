@@ -74,12 +74,12 @@ def PathRouter(extensionList, folder):
                         print(f"[status] file fetched : {filePath}")
                         DetailWriter(folder, filePath)
                     else:
-                        print(f"[status] could not fetched, already exists : {fileName}")
-                        # uniquePath = folder + "/" + os.path.splitext(fileName)[0] + "-" + str(uuid.uuid4()) + pathlib.Path(fileName).suffix
-                        # print(f"{uniquePath=}")
-                        # copy(filePath, uniquePath)
+                        # print(f"[status] could not fetched, already exists : {fileName}")
+                        uniquePath = folder + "/" + os.path.splitext(fileName)[0] + "-" + str(uuid.uuid4()) + pathlib.Path(fileName).suffix
+                        print(f"{uniquePath=}")
+                        copy(filePath, uniquePath)
                         # print(f"[status : unique] file fetched : {filePath}")
-                        # DetailWriter(folder, filePath)
+                        DetailWriter(folder, filePath)
 
 def main():
     FolderCreator()
