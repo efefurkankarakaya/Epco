@@ -1,6 +1,6 @@
 # Epco
 
-File classifier and copier tool.
+File classifier tool.
 
 # Run
 
